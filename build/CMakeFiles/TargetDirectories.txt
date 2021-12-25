@@ -1,0 +1,3 @@
+/home/zhou/codes/learnOpenGL/build/CMakeFiles/rebuild_cache.dir
+/home/zhou/codes/learnOpenGL/build/CMakeFiles/edit_cache.dir
+/home/zhou/codes/learnOpenGL/build/CMakeFiles/learnOpenGL.dir
