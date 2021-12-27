@@ -41,7 +41,8 @@ vec3 CalcPointLight(PointLight L)
 
     vec3 viewDir = normalize(eyePos - FragPos);
     vec3 halfVec = normalize(lightDir + viewDir);
-    vec3 specular = M.ks * vec3(texture(M.texture_specular1, st).xyz) * (L.lightColor / pow(lightDistance, 2)) * pow(max(dot(halfVec, Normal), 0), M.shininess);
+    //vec3 specular = M.ks * vec3(texture(M.texture_specular1, st).xyz) * (L.lightColor / pow(lightDistance, 2)) * pow(max(dot(halfVec, Normal), 0), M.shininess);
+    vec3 specular = M.ks * (L.lightColor / pow(lightDistance, 2)) * pow(max(dot(halfVec, normalize(Normal)), 0), M.shininess);
 
     return (ambient + diffuse + specular);
 }
@@ -49,10 +50,12 @@ vec3 CalcPointLight(PointLight L)
 void main()
 {
     vec3 finalColor = vec3(0.0, 0.0, 0.0); 
-    for(int i=0; i<NR_POINT_LIGHTS; i++)
+    for(int i = 0; i < NR_POINT_LIGHTS; i++)
     {
         finalColor += CalcPointLight(Light[i]);
     }
     
+    //FragColor = texture(M.texture_diffuse1, st);
     FragColor = vec4(finalColor, 1.0f);    
+    //FragColor = vec4(CalcPointLight(Light[0]), 1.0);
 }

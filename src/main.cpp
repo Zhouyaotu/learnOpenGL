@@ -89,6 +89,7 @@ int main()
 
     // bind data to obj
     Model ourModel("../model/black/nanosuit.obj");
+    //Model ourModel("../model/mary/Marry.obj");
 
     DataObj light = DataObj<float>();
     light.bindVAO();
@@ -99,7 +100,7 @@ int main()
 
     // set texture
     /*
-    Texture2D texture01 = Texture2D(GL_TEXTURE0);
+    Texture2D texture01 = Texture2D(GL_TEXTURE31);
     texture01.setParameteri(GL_TEXTURE_WRAP_S, GL_REPEAT);
     texture01.setParameteri(GL_TEXTURE_WRAP_T, GL_REPEAT);
     texture01.setParameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -138,7 +139,7 @@ int main()
         glm::mat4 p(1.0f);
         p = glm::perspective(glm::radians(45.0f), screenWidth / screenHeight, 0.1f, 100.0f);
         glm::mat4 m_obj(1.0f);
-        //m_obj = glm::rotate(m_obj, glm::radians(45.0f), glm::vec3(1.0f, 0.3f, 0.5f));
+        m_obj = glm::scale(m_obj, glm::vec3(0.15));
 
         // use shader program and set uniformValue
         objShader.use();
@@ -146,17 +147,13 @@ int main()
         objShader.setMat4("v", v);
         objShader.setMat4("p", p);
         objShader.setMat4("m", m_obj);
-
         objShader.setMat4("NormalMat", glm::transpose(glm::inverse(m_obj)));
-        objShader.setVec3("lightColor", lightColor);
-        objShader.setVec3("lightPos", lightPos);
+
+        objShader.setVec3("Light[0].lightColor", lightColor);
+        objShader.setVec3("Light[0].lightPos", lightPos);
         
         objShader.setVec3("eyePos", camera.Position);
-        objShader.setVec3("M.ka", glm::vec3(0.1f, 0.1f, 0.1f));
-        objShader.setVec3("intensityAmbient", glm::vec3(0.2,0.2,0.2));
-        objShader.setVec3("M.kd", glm::vec3(0.3f, 0.3f, 0.3f));
-        objShader.setVec3("M.ks", glm::vec3(0.2, 0.2, 0.2));
-        objShader.setFloat("M.shininess", 64.0);
+        objShader.setVec3("intensityAmbient", glm::vec3(0.1,0.1,0.1));
 
         // draw
         ourModel.Draw(objShader);
@@ -180,7 +177,6 @@ int main()
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
-
     }
 
     // terminate GLFW before close

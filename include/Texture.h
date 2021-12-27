@@ -18,7 +18,8 @@ public:
     GLenum texUnit;
 
     Texture2D();
-    Texture2D(GLenum texUnit);
+    Texture2D(unsigned int id);
+    //Texture2D(Texture2D & obj);
     ~Texture2D();
     void bind(GLenum);
     void load(const char* path);
@@ -29,15 +30,14 @@ Texture2D::Texture2D()
     glGenTextures(1, &ID);
 }
 
-Texture2D::Texture2D(GLenum texUnit)
+Texture2D::Texture2D(unsigned int id)
 {
-    glGenTextures(1, &ID);
-    this->texUnit = texUnit;   
+    this->ID = id;
 }
 
 Texture2D::~Texture2D()
 {
-    glDeleteTextures(1, &ID);
+    //glDeleteTextures(1, &ID);
 }
 
 void Texture2D::bind(GLenum name)
@@ -51,8 +51,10 @@ void Texture2D::bind(GLenum name)
 void Texture2D::load(const char *path)
 {
     GLenum format;
-    stbi_set_flip_vertically_on_load(true);
+    stbi_set_flip_vertically_on_load(false);
     img_data = stbi_load(path, &width, &height, &nrChannels, 0);
+    //std::cout << path << " " << sizeof(img_data)<< " " << nrChannels << " " << width << " " <<height <<"\n";
+    
     switch (nrChannels)
     {
     case 4:

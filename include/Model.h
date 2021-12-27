@@ -29,7 +29,7 @@ class Model
         void loadModel(std::string path);
         void processNode(aiNode *node, const aiScene *scene);
         Mesh processMesh(aiMesh *mesh, const aiScene *scene);
-        std::vector<Texture2D> loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName);
+        std::vector<Texture2D> loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName, glm::vec3 &ka, glm::vec3 &kd, glm::vec3 &ks);
 };
 
 void Model::Draw(Shader shader)
@@ -120,37 +120,41 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene)
     if(mesh->mMaterialIndex >= 0)
     {
         aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
-        std::cout<<scene->mNumMaterials << std::endl;
+        std::cout<< "model - vert:index " <<mesh->mNumVertices << ":" << mesh->mNumFaces << std::endl;
+        
+        glm::vec3 ka, kd, ks;
 
-        std::vector<Texture2D> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
+        std::vector<Texture2D> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse", ka, kd, ks);
         textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
 
-        std::vector<Texture2D> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
+        std::vector<Texture2D> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular", ka, kd, ks);
         textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
     }
 
     return Mesh(vertices, indices, textures);
 }
 
-std::vector<Texture2D> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName)
+std::vector<Texture2D> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName, glm::vec3 &ka, glm::vec3 &kd, glm::vec3 &ks)
 {
     std::vector<Texture2D> textures;
-    //std::cout << mat->GetTextureCount(type) << " ";// << std::endl;
-    aiString str1;
+
     for(int i = 0; i < mat->GetTextureCount(type); i++)
     {
         aiString str, name;
         aiColor3D color;
-        //aiGetMaterialTexture(mat, type, i, &str);
-        std::cout << (mat->Get(AI_MATKEY_TEXTURE(aiTextureType_DIFFUSE, 0), str) == AI_SUCCESS);
-        mat->Get(AI_MATKEY_COLOR_DIFFUSE, color);
-        //mat->Get(AI_MATKEY_TEXTURE_DIFFUSE,0,name);
-        //mat->GetTexture(type, 0, &str);
         
-        //mat->Get(AI_MATKEY_NAME, name);
-        //str.Set("123");
-        std::cout << str.data << std::endl;
-        std::cout << color.r << std::endl;
+        mat->Get(AI_MATKEY_COLOR_AMBIENT, color);
+        ka = glm::vec3(color.r, color.g, color.b);
+        mat->Get(AI_MATKEY_COLOR_DIFFUSE, color);
+        kd = glm::vec3(color.r, color.g, color.b);
+        mat->Get(AI_MATKEY_COLOR_SPECULAR, color);
+        ks = glm::vec3(color.r, color.g, color.b);
+        //std::cout << color.r << std::endl;
+
+        mat->GetTexture(type, i, &str);
+        //mat->Get(AI_MATKEY_TEXTURE(type, i), str);
+        //std::cout << "texture" <<str.C_Str() << std::endl;
+        
 
         bool skip = false;
         for(unsigned int j = 0; j < textures_loaded.size(); j++)
@@ -166,15 +170,17 @@ std::vector<Texture2D> Model::loadMaterialTextures(aiMaterial *mat, aiTextureTyp
         if(!skip)
         {   // 如果纹理还没有被加载，则加载它
             Texture2D texture = Texture2D();
+            //std::cout << textureID << "\n";
+
+            std::string filename = std::string(str.C_Str());
+            filename = this->directory + '/' + filename;
+            texture.load(filename.c_str());
+
             texture.setParameteri(GL_TEXTURE_WRAP_S, GL_REPEAT);
             texture.setParameteri(GL_TEXTURE_WRAP_T, GL_REPEAT);
             texture.setParameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
             texture.setParameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-            std::string filename = std::string(str.C_Str());
-            filename = this->directory + '/' + filename;
-            
-            texture.load(filename.c_str());
             texture.type = typeName;
             texture.path = str.C_Str();
 

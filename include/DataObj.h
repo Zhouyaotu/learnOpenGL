@@ -22,7 +22,6 @@ public:
     void loadVertexs(DataObj & aObj);
 
     void loadIndices(unsigned int* indices, int totalSize, int step);
-    void loadIndices(std::vector<unsigned int> indices, int totalSize, int step);
 
     void setVertexAtrribPointer(int location, GLint dataSize, GLenum dataType, GLboolean toNorm, int step, void* offset);
 
@@ -36,6 +35,7 @@ DataObj<T>::DataObj():vertCount(0),indexCount(0)
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
     glGenBuffers(1, &EBO);
+    //std::cout << VAO << " " << VBO << ' ' << EBO << ' ' << indexCount << "\n";
 }
 
 template<typename T>
@@ -80,7 +80,7 @@ void DataObj<T>::loadIndices(unsigned int *indices, int totalSize, int step)
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO); // load index
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, totalSize, indices, GL_STATIC_DRAW);
     indexCount = dataCount<unsigned int>(totalSize, step);
-
+    //std::cout << VAO << " " << VBO << ' ' << EBO << ' ' << indexCount << "\n";
     glBindVertexArray(0);
 }
 

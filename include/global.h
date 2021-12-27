@@ -43,5 +43,4 @@ struct Vertex {
     glm::vec2 TexCoords;
 };
 
-
 #endif
