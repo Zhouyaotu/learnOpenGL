@@ -135,7 +135,7 @@ int main()
     texture01.setParameteri(GL_TEXTURE_WRAP_T, GL_REPEAT);
     texture01.setParameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     texture01.setParameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    texture01.load("../img/container.jpg", JPG);
+    texture01.load("../img/container.jpg");
 
     Texture2D texture02 = Texture2D(GL_TEXTURE1);
     texture02.bind(GL_TEXTURE1);
@@ -143,7 +143,7 @@ int main()
     texture02.setParameteri(GL_TEXTURE_WRAP_T, GL_REPEAT);
     texture02.setParameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     texture02.setParameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    texture02.load("../img/awesomeface.png", PNG);
+    texture02.load("../img/awesomeface.png");
 
     // set shader
     Shader myShader("../shader/vertex.vs", "../shader/fragment.fs");

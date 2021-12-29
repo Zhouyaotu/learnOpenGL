@@ -5,6 +5,8 @@
 #include "Texture.h"
 #include "DataObj.h"
 #include "Camera.h"
+#include "Mesh.h"
+#include "Model.h"
 
 // ==== data ====
 float vertices[] = {
@@ -52,6 +54,17 @@ float vertices[] = {
     -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f
 };
 
+float planeVertices[] = {
+        // positions          // texture Coords (note we set these higher than 1 (together with GL_REPEAT as texture wrapping mode). this will cause the floor texture to repeat)
+         5.0f, -0.5f,  5.0f,  2.0f, 0.0f,
+        -5.0f, -0.5f,  5.0f,  0.0f, 0.0f,
+        -5.0f, -0.5f, -5.0f,  0.0f, 2.0f,
+
+         5.0f, -0.5f,  5.0f,  2.0f, 0.0f,
+        -5.0f, -0.5f, -5.0f,  0.0f, 2.0f,
+         5.0f, -0.5f, -5.0f,  2.0f, 2.0f								
+    };
+
 // ==== MAIN ====
 int main()
 {
@@ -86,32 +99,36 @@ int main()
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     // bind data to obj
-    DataObj cube = DataObj<float>();
-    cube.bindVAO();
-    cube.loadVertexs(vertices, sizeof(vertices), 8);
-    cube.setVertexAtrribPointer(0, 3, GL_FLOAT, GL_FALSE, 8, (void *)0);
-    cube.setVertexAtrribPointer(1, 3, GL_FLOAT, GL_FALSE, 8, (void *)(3 * sizeof(float)));
-    cube.setVertexAtrribPointer(2, 2, GL_FLOAT, GL_FALSE, 8, (void *)(6 * sizeof(float)));
+    Model ourModel("../model/black/nanosuit.obj");
+    //Model ourModel("../model/mary/Marry.obj");
 
     DataObj light = DataObj<float>();
     light.bindVAO();
-    //light.loadVertexs(myCube, sizeof(myCube), 5);
-    light.loadVertexs(cube);
+    light.loadVertexs(vertices, sizeof(vertices), 8);
     light.setVertexAtrribPointer(0, 3, GL_FLOAT, GL_FALSE, 8, (void *)0);
     light.setVertexAtrribPointer(1, 3, GL_FLOAT, GL_FALSE, 8, (void *)(3 * sizeof(float)));
     light.setVertexAtrribPointer(2, 2, GL_FLOAT, GL_FALSE, 8, (void *)(6 * sizeof(float)));
 
+    DataObj plane = DataObj<float>();
+    plane.bindVAO();
+    plane.loadVertexs(planeVertices, sizeof(planeVertices), 5);
+    plane.setVertexAtrribPointer(0, 3, GL_FLOAT, GL_FALSE, 5, (void *)0);
+    plane.setVertexAtrribPointer(1, 2, GL_FLOAT, GL_FALSE, 5, (void *)(3 * sizeof(float)));
+
     // set texture
-    Texture2D texture01 = Texture2D(GL_TEXTURE0);
+    ///*
+    Texture2D texture01 = Texture2D();
     texture01.setParameteri(GL_TEXTURE_WRAP_S, GL_REPEAT);
     texture01.setParameteri(GL_TEXTURE_WRAP_T, GL_REPEAT);
     texture01.setParameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     texture01.setParameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    texture01.load("../img/container2.png");
+    texture01.load("../img/metal.png");
+    //*/
 
     // set shader
     Shader objShader("../shader/vertex.vs", "../shader/object.fs");
     Shader lightShader("../shader/vertex.vs", "../shader/light.fs");
+    Shader planeShader("../shader/plane.vs", "../shader/fragment.fs");
 
     // enable z-test
     glEnable(GL_DEPTH_TEST);
@@ -120,49 +137,43 @@ int main()
     while (!glfwWindowShouldClose(window))
     {
         // set clear color
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // deal with input
         processInput(window);
 
         // bind texture
-        texture01.bind(GL_TEXTURE0);
+        //texture01.bind(GL_TEXTURE0);
 
-        // mvp
+        // ligth
         glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
         glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
 
-        // mvp
+        // set (m)vp matrix
         glm::mat4 v(1.0f);
         v = camera.GetViewMatrix();
         glm::mat4 p(1.0f);
         p = glm::perspective(glm::radians(45.0f), screenWidth / screenHeight, 0.1f, 100.0f);
-        glm::mat4 m_obj(1.0f);
-        //m_obj = glm::rotate(m_obj, glm::radians(45.0f), glm::vec3(1.0f, 0.3f, 0.5f));
 
-        // use shader program and set uniformValue
-        objShader.use();
+        // draw obj
+        glm::mat4 m_obj(1.0f);
+        m_obj = glm::scale(m_obj, glm::vec3(0.15));
+
+        objShader.use();// use shader program and set uniformValue
         
         objShader.setMat4("v", v);
         objShader.setMat4("p", p);
         objShader.setMat4("m", m_obj);
-
         objShader.setMat4("NormalMat", glm::transpose(glm::inverse(m_obj)));
+
         objShader.setVec3("Light[0].lightColor", lightColor);
         objShader.setVec3("Light[0].lightPos", lightPos);
-
+        
         objShader.setVec3("eyePos", camera.Position);
-        objShader.setVec3("intensityAmbient", glm::vec3(0.2,0.2,0.2));
+        objShader.setVec3("intensityAmbient", glm::vec3(0.1,0.1,0.1));
 
-        objShader.setInt("M.texture_diffuse1",0);
-        objShader.setVec3("M.ka", glm::vec3(0.1f, 0.1f, 0.1f));
-        objShader.setVec3("M.kd", glm::vec3(0.7f, 0.7f, 0.7f));
-        objShader.setVec3("M.ks", glm::vec3(0.2, 0.2, 0.2));
-        objShader.setFloat("M.shininess", 64.0);
-
-        // draw
-        cube.drawArray(GL_TRIANGLES, 0);
+        ourModel.Draw(objShader);
 
         // draw light cube
         glm::mat4 m_light(1.0f);
@@ -175,6 +186,8 @@ int main()
 
         light.drawArray(GL_TRIANGLES, 0);        
         
+        // draw plane
+
         // fill frame from buffer
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -183,7 +196,6 @@ int main()
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
-
     }
 
     // terminate GLFW before close

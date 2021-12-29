@@ -54,6 +54,17 @@ float vertices[] = {
     -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f
 };
 
+float planeVertices[] = {
+        // positions          // texture Coords (note we set these higher than 1 (together with GL_REPEAT as texture wrapping mode). this will cause the floor texture to repeat)
+         5.0f, -0.5f,  5.0f,  2.0f, 0.0f,
+        -5.0f, -0.5f,  5.0f,  0.0f, 0.0f,
+        -5.0f, -0.5f, -5.0f,  0.0f, 2.0f,
+
+         5.0f, -0.5f,  5.0f,  2.0f, 0.0f,
+        -5.0f, -0.5f, -5.0f,  0.0f, 2.0f,
+         5.0f, -0.5f, -5.0f,  2.0f, 2.0f								
+    };
+
 // ==== MAIN ====
 int main()
 {
@@ -93,24 +104,31 @@ int main()
 
     DataObj light = DataObj<float>();
     light.bindVAO();
-    light.loadVertexs(vertices, sizeof(vertices), 6);
+    light.loadVertexs(vertices, sizeof(vertices), 8);
     light.setVertexAtrribPointer(0, 3, GL_FLOAT, GL_FALSE, 8, (void *)0);
     light.setVertexAtrribPointer(1, 3, GL_FLOAT, GL_FALSE, 8, (void *)(3 * sizeof(float)));
     light.setVertexAtrribPointer(2, 2, GL_FLOAT, GL_FALSE, 8, (void *)(6 * sizeof(float)));
 
+    DataObj plane = DataObj<float>();
+    plane.bindVAO();
+    plane.loadVertexs(planeVertices, sizeof(planeVertices), 5);
+    plane.setVertexAtrribPointer(0, 3, GL_FLOAT, GL_FALSE, 5, (void *)0);
+    plane.setVertexAtrribPointer(1, 2, GL_FLOAT, GL_FALSE, 5, (void *)(3 * sizeof(float)));
+
     // set texture
-    /*
-    Texture2D texture01 = Texture2D(GL_TEXTURE31);
+    ///*
+    Texture2D texture01 = Texture2D();
     texture01.setParameteri(GL_TEXTURE_WRAP_S, GL_REPEAT);
     texture01.setParameteri(GL_TEXTURE_WRAP_T, GL_REPEAT);
     texture01.setParameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     texture01.setParameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    texture01.load("../img/container2.png");
-    */
+    texture01.load("../img/metal.png");
+    //*/
 
     // set shader
     Shader objShader("../shader/vertex.vs", "../shader/object.fs");
     Shader lightShader("../shader/vertex.vs", "../shader/light.fs");
+    Shader planeShader("../shader/plane.vs", "../shader/fragment.fs");
 
     // enable z-test
     glEnable(GL_DEPTH_TEST);
@@ -119,7 +137,7 @@ int main()
     while (!glfwWindowShouldClose(window))
     {
         // set clear color
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // deal with input
@@ -128,21 +146,22 @@ int main()
         // bind texture
         //texture01.bind(GL_TEXTURE0);
 
-        // mvp
-        glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
+        // ligth
+        glm::vec3 lightPos(1.5f, 1.0f, 2.0f);
+        glm::vec3 lightPos1(-1.9f, 2.0f, 0.0f);
         glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
-        glm::vec3 objColor(1.0f, 0.5f, 0.31f);
 
-        // mvp
+        // set (m)vp matrix
         glm::mat4 v(1.0f);
         v = camera.GetViewMatrix();
         glm::mat4 p(1.0f);
         p = glm::perspective(glm::radians(45.0f), screenWidth / screenHeight, 0.1f, 100.0f);
+
+        // draw obj
         glm::mat4 m_obj(1.0f);
         m_obj = glm::scale(m_obj, glm::vec3(0.15));
-
-        // use shader program and set uniformValue
-        objShader.use();
+        m_obj = glm::translate(m_obj, glm::vec3(0.0, -3.3, 0.0));
+        objShader.use();// use shader program and set uniformValue
         
         objShader.setMat4("v", v);
         objShader.setMat4("p", p);
@@ -151,14 +170,16 @@ int main()
 
         objShader.setVec3("Light[0].lightColor", lightColor);
         objShader.setVec3("Light[0].lightPos", lightPos);
+        objShader.setVec3("Light[1].lightColor", lightColor);
+        objShader.setVec3("Light[1].lightPos", lightPos1);
         
         objShader.setVec3("eyePos", camera.Position);
         objShader.setVec3("intensityAmbient", glm::vec3(0.1,0.1,0.1));
 
-        // draw
         ourModel.Draw(objShader);
 
-        // draw light cube
+        // draw light cube0
+        ///*
         glm::mat4 m_light(1.0f);
         m_light = glm::translate(m_light, lightPos);
         m_light = glm::scale(m_light, glm::vec3(0.1f));
@@ -167,8 +188,29 @@ int main()
         lightShader.setMat4("p", p);
         lightShader.setMat4("m", m_light);
 
+        light.drawArray(GL_TRIANGLES, 0);  
+
+        //*/draw light cube1
+        glm::mat4 m_light1(1.0f);
+        m_light1 = glm::translate(m_light1, lightPos1);
+        m_light1 = glm::scale(m_light1, glm::vec3(0.1f));
+        lightShader.use();
+        lightShader.setMat4("v", v);
+        lightShader.setMat4("p", p);
+        lightShader.setMat4("m", m_light1);
+
         light.drawArray(GL_TRIANGLES, 0);        
         
+        // draw plane
+        texture01.bind(GL_TEXTURE0);
+        planeShader.use();
+        planeShader.setMat4("v", v);
+        planeShader.setMat4("p", p);
+        planeShader.setMat4("m", glm::mat4(1.0f));
+        planeShader.setInt("texture1", 0);
+
+        plane.drawArray(GL_TRIANGLES, 0); 
+
         // fill frame from buffer
         glfwSwapBuffers(window);
         glfwPollEvents();

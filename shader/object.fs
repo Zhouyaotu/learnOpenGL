@@ -1,6 +1,6 @@
 #version 330 core
 
-#define NR_POINT_LIGHTS 1
+#define NR_POINT_LIGHTS 2
 
 struct Material{
     vec3 ka;
@@ -41,8 +41,8 @@ vec3 CalcPointLight(PointLight L)
 
     vec3 viewDir = normalize(eyePos - FragPos);
     vec3 halfVec = normalize(lightDir + viewDir);
-    //vec3 specular = M.ks * vec3(texture(M.texture_specular1, st).xyz) * (L.lightColor / pow(lightDistance, 2)) * pow(max(dot(halfVec, Normal), 0), M.shininess);
-    vec3 specular = M.ks * (L.lightColor / pow(lightDistance, 2)) * pow(max(dot(halfVec, normalize(Normal)), 0), M.shininess);
+    vec3 specular = vec3(texture(M.texture_specular1, st).xyz) * (L.lightColor / pow(lightDistance, 2)) * pow(max(dot(halfVec, normalize(Normal)), 0), M.shininess);
+    //vec3 specular = M.ks * (L.lightColor / pow(lightDistance, 2)) * pow(max(dot(halfVec, normalize(Normal)), 0), M.shininess);
 
     return (ambient + diffuse + specular);
 }
