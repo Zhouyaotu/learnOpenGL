@@ -77,6 +77,7 @@ void Texture2D::load(const char *path)
     }
     else
         std::cout << "Failed to load texture" << std::endl;
+        
     stbi_image_free(img_data);
 }
 
