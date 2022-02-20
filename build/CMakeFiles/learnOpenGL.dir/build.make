@@ -60,41 +60,41 @@ include CMakeFiles/learnOpenGL.dir/flags.make
 CMakeFiles/learnOpenGL.dir/src/glad.c.o: CMakeFiles/learnOpenGL.dir/flags.make
 CMakeFiles/learnOpenGL.dir/src/glad.c.o: ../src/glad.c
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/zhou/codes/learnOpenGL/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/learnOpenGL.dir/src/glad.c.o"
-	/usr/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/learnOpenGL.dir/src/glad.c.o   -c /home/zhou/codes/learnOpenGL/src/glad.c
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/learnOpenGL.dir/src/glad.c.o   -c /home/zhou/codes/learnOpenGL/src/glad.c
 
 CMakeFiles/learnOpenGL.dir/src/glad.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/learnOpenGL.dir/src/glad.c.i"
-	/usr/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/zhou/codes/learnOpenGL/src/glad.c > CMakeFiles/learnOpenGL.dir/src/glad.c.i
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/zhou/codes/learnOpenGL/src/glad.c > CMakeFiles/learnOpenGL.dir/src/glad.c.i
 
 CMakeFiles/learnOpenGL.dir/src/glad.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/learnOpenGL.dir/src/glad.c.s"
-	/usr/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/zhou/codes/learnOpenGL/src/glad.c -o CMakeFiles/learnOpenGL.dir/src/glad.c.s
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/zhou/codes/learnOpenGL/src/glad.c -o CMakeFiles/learnOpenGL.dir/src/glad.c.s
 
 CMakeFiles/learnOpenGL.dir/src/main.cpp.o: CMakeFiles/learnOpenGL.dir/flags.make
 CMakeFiles/learnOpenGL.dir/src/main.cpp.o: ../src/main.cpp
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/zhou/codes/learnOpenGL/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/learnOpenGL.dir/src/main.cpp.o"
-	/usr/bin/g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/learnOpenGL.dir/src/main.cpp.o -c /home/zhou/codes/learnOpenGL/src/main.cpp
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/learnOpenGL.dir/src/main.cpp.o -c /home/zhou/codes/learnOpenGL/src/main.cpp
 
 CMakeFiles/learnOpenGL.dir/src/main.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/learnOpenGL.dir/src/main.cpp.i"
-	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/zhou/codes/learnOpenGL/src/main.cpp > CMakeFiles/learnOpenGL.dir/src/main.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/zhou/codes/learnOpenGL/src/main.cpp > CMakeFiles/learnOpenGL.dir/src/main.cpp.i
 
 CMakeFiles/learnOpenGL.dir/src/main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/learnOpenGL.dir/src/main.cpp.s"
-	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/zhou/codes/learnOpenGL/src/main.cpp -o CMakeFiles/learnOpenGL.dir/src/main.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/zhou/codes/learnOpenGL/src/main.cpp -o CMakeFiles/learnOpenGL.dir/src/main.cpp.s
 
 CMakeFiles/learnOpenGL.dir/src/stb_image.cpp.o: CMakeFiles/learnOpenGL.dir/flags.make
 CMakeFiles/learnOpenGL.dir/src/stb_image.cpp.o: ../src/stb_image.cpp
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/zhou/codes/learnOpenGL/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/learnOpenGL.dir/src/stb_image.cpp.o"
-	/usr/bin/g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/learnOpenGL.dir/src/stb_image.cpp.o -c /home/zhou/codes/learnOpenGL/src/stb_image.cpp
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/learnOpenGL.dir/src/stb_image.cpp.o -c /home/zhou/codes/learnOpenGL/src/stb_image.cpp
 
 CMakeFiles/learnOpenGL.dir/src/stb_image.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/learnOpenGL.dir/src/stb_image.cpp.i"
-	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/zhou/codes/learnOpenGL/src/stb_image.cpp > CMakeFiles/learnOpenGL.dir/src/stb_image.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/zhou/codes/learnOpenGL/src/stb_image.cpp > CMakeFiles/learnOpenGL.dir/src/stb_image.cpp.i
 
 CMakeFiles/learnOpenGL.dir/src/stb_image.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/learnOpenGL.dir/src/stb_image.cpp.s"
-	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/zhou/codes/learnOpenGL/src/stb_image.cpp -o CMakeFiles/learnOpenGL.dir/src/stb_image.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/zhou/codes/learnOpenGL/src/stb_image.cpp -o CMakeFiles/learnOpenGL.dir/src/stb_image.cpp.s
 
 # Object files for target learnOpenGL
 learnOpenGL_OBJECTS = \
