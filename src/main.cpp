@@ -102,14 +102,14 @@ int main()
     Model ourModel("../model/black/nanosuit.obj");
     //Model ourModel("../model/mary/Marry.obj");
 
-    DataObj light = DataObj<float>();
+    DataObj<float> light = DataObj<float>();
     light.bindVAO();
     light.loadVertexs(vertices, sizeof(vertices), 8);
     light.setVertexAtrribPointer(0, 3, GL_FLOAT, GL_FALSE, 8, (void *)0);
     light.setVertexAtrribPointer(1, 3, GL_FLOAT, GL_FALSE, 8, (void *)(3 * sizeof(float)));
     light.setVertexAtrribPointer(2, 2, GL_FLOAT, GL_FALSE, 8, (void *)(6 * sizeof(float)));
 
-    DataObj plane = DataObj<float>();
+    DataObj<float> plane = DataObj<float>();
     plane.bindVAO();
     plane.loadVertexs(planeVertices, sizeof(planeVertices), 5);
     plane.setVertexAtrribPointer(0, 3, GL_FLOAT, GL_FALSE, 5, (void *)0);
