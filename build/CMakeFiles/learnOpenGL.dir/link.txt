@@ -1,1 +1,0 @@
-/usr/bin/c++    -rdynamic CMakeFiles/learnOpenGL.dir/src/glad.c.o CMakeFiles/learnOpenGL.dir/src/main.cpp.o CMakeFiles/learnOpenGL.dir/src/stb_image.cpp.o  -o learnOpenGL -lglfw3 -lGL -lm -lXrandr -lXi -lX11 -lXxf86vm -lpthread -ldl -lXinerama -lXcursor -lassimp 
