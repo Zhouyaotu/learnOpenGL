@@ -86,14 +86,14 @@ int main()
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     // bind data to obj
-    DataObj cube = DataObj<float>();
+    DataObj<float> cube = DataObj<float>();
     cube.bindVAO();
     cube.loadVertexs(vertices, sizeof(vertices), 8);
     cube.setVertexAtrribPointer(0, 3, GL_FLOAT, GL_FALSE, 8, (void *)0);
     cube.setVertexAtrribPointer(1, 3, GL_FLOAT, GL_FALSE, 8, (void *)(3 * sizeof(float)));
     cube.setVertexAtrribPointer(2, 2, GL_FLOAT, GL_FALSE, 8, (void *)(6 * sizeof(float)));
 
-    DataObj light = DataObj<float>();
+    DataObj<float> light = DataObj<float>();
     light.bindVAO();
     //light.loadVertexs(myCube, sizeof(myCube), 5);
     light.loadVertexs(cube);
