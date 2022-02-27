@@ -127,7 +127,7 @@ int main()
 
     DataObj<float> quad = DataObj<float>();
     quad.bindVAO();
-    quad.loadVertexs(quadVertices, sizeof(quadVertices), 5);
+    quad.loadVertexs(quadVertices, sizeof(quadVertices), 4);
     quad.setVertexAtrribPointer(0, 2, GL_FLOAT, GL_FALSE, 4, (void *)0);
     quad.setVertexAtrribPointer(1, 2, GL_FLOAT, GL_FALSE, 4, (void *)(2 * sizeof(float)));
 
@@ -263,6 +263,11 @@ int main()
         
         // bind defualt fbo
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+        // set clear color
+        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        
         // draw a flat
         textureQuad.bind(GL_TEXTURE0);
         quadShader.use();
