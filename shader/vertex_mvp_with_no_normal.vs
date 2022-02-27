@@ -9,7 +9,6 @@ out vec2 st;
 uniform mat4 m;
 uniform mat4 v;
 uniform mat4 p;
-uniform mat4 NormalMat;
 
 void main()
 {

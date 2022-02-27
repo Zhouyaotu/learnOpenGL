@@ -4,7 +4,7 @@ set(CMAKE_CXX_STANDARD 17)
 project(learnOpenGL)
 
 aux_source_directory(./src SRC)
-include_directories(./include)
+include_directories(./include ./lib/include)
 
 add_executable(${PROJECT_NAME} ${SRC})
 

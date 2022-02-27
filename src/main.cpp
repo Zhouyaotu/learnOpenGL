@@ -117,23 +117,25 @@ int main()
 
     // set texture
     ///*
-    Texture2D texture01 = Texture2D();
-    texture01.setParameteri(GL_TEXTURE_WRAP_S, GL_REPEAT);
-    texture01.setParameteri(GL_TEXTURE_WRAP_T, GL_REPEAT);
-    texture01.setParameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    texture01.setParameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    texture01.load("../img/metal.png");
+    Texture2D texturePlane = Texture2D();
+    texturePlane.setParameteri(GL_TEXTURE_WRAP_S, GL_REPEAT);
+    texturePlane.setParameteri(GL_TEXTURE_WRAP_T, GL_REPEAT);
+    texturePlane.setParameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    texturePlane.setParameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    texturePlane.load("../img/metal.png");
+
     //*/
 
     // set shader
-    Shader objShader("../shader/vertex.vs", "../shader/object.fs");
-    Shader oneColorShader("../shader/vertex.vs", "../shader/onlyColor.fs");
-    Shader lightShader("../shader/vertex.vs", "../shader/light.fs");
-    Shader planeShader("../shader/plane.vs", "../shader/onlyTexture.fs");
+    Shader objShader("../shader/vertex_mvp.vs", "../shader/object.fs");
+    Shader oneColorShader("../shader/vertex_mvp.vs", "../shader/onlyColor.fs");
+    Shader lightShader("../shader/vertex_mvp.vs", "../shader/onlyColor.fs");
+    Shader planeShader("../shader/vertex_mvp_with_no_normal.vs", "../shader/onlyTexture.fs");
 
     // enable tests
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_STENCIL_TEST);
+    //glEnable(GL_STENCIL_TEST);
+    //glEnable(GL_CULL_FACE);
 
     // draw loop
     while (!glfwWindowShouldClose(window))
@@ -141,8 +143,8 @@ int main()
         // set clear color
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 
-        glStencilMask(0xFF); // templete test
-        glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+        //glStencilMask(0xFF); // templete test
+        //glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
@@ -158,8 +160,8 @@ int main()
         glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
 
         // draw obj
-        glStencilFunc(GL_ALWAYS, 1, 0xFF);
-        glStencilMask(0xFF);
+        //glStencilFunc(GL_ALWAYS, 1, 0xFF);
+        //glStencilMask(0xFF);
 
         glm::mat4 v(1.0f);
         v = camera.GetViewMatrix();
@@ -188,6 +190,7 @@ int main()
         ourModel.Draw(objShader);
 
         // draw selectionModel
+        /*
         glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
         glStencilMask(0x00);
         glm::mat4 s_obj(1.0f);
@@ -202,9 +205,9 @@ int main()
 
         ourModel.Draw(oneColorShader);
         glStencilFunc(GL_ALWAYS, 0, 0xFF);
-
+        */
+       
         // draw light cube0
-        ///*
         glm::mat4 m_light(1.0f);
         m_light = glm::translate(m_light, lightPos);
         m_light = glm::scale(m_light, glm::vec3(0.1f));
@@ -216,7 +219,7 @@ int main()
 
         light.drawArray(GL_TRIANGLES, 0);  
 
-        //*/draw light cube1
+        // draw light cube1
         glm::mat4 m_light1(1.0f);
         m_light1 = glm::translate(m_light1, lightPos1);
         m_light1 = glm::scale(m_light1, glm::vec3(0.1f));
@@ -229,7 +232,7 @@ int main()
         light.drawArray(GL_TRIANGLES, 0);        
         
         // draw plane
-        texture01.bind(GL_TEXTURE0);
+        texturePlane.bind(GL_TEXTURE0);
         planeShader.use();
         planeShader.setMat4("v", v);
         planeShader.setMat4("p", p);
