@@ -23,6 +23,7 @@ public:
     ~Texture2D();
     void bind(GLenum);
     void load(const char* path);
+    void setTexture(GLenum format, int width, int height, unsigned char* data);
     void setParameteri(GLenum, GLint);
 };
 Texture2D::Texture2D()
@@ -79,6 +80,13 @@ void Texture2D::load(const char *path)
         std::cout << "Failed to load texture" << std::endl;
         
     stbi_image_free(img_data);
+}
+
+void Texture2D::setTexture(GLenum format, int width, int height, unsigned char* data)
+{
+    glBindTexture(GL_TEXTURE_2D, ID);
+    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, img_data);
+    glGenerateMipmap(GL_TEXTURE_2D); 
 }
 
 void Texture2D::setParameteri(GLenum pname, GLint param)

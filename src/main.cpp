@@ -65,6 +65,17 @@ float planeVertices[] = {
          5.0f, -0.5f, -5.0f,  2.0f, 2.0f								
     };
 
+float quadVertices[] = { // vertex attributes for a quad that fills the entire screen in Normalized Device Coordinates.
+        // positions   // texCoords
+        -1.0f,  1.0f,  0.0f, 1.0f,
+        -1.0f, -1.0f,  0.0f, 0.0f,
+         1.0f, -1.0f,  1.0f, 0.0f,
+
+        -1.0f,  1.0f,  0.0f, 1.0f,
+         1.0f, -1.0f,  1.0f, 0.0f,
+         1.0f,  1.0f,  1.0f, 1.0f
+    };
+
 // ==== MAIN ====
 int main()
 {
@@ -100,7 +111,6 @@ int main()
 
     // bind data to obj
     Model ourModel("../model/black/nanosuit.obj");
-    //Model ourModel("../model/mary/Marry.obj");
 
     DataObj<float> light = DataObj<float>();
     light.bindVAO();
@@ -115,8 +125,13 @@ int main()
     plane.setVertexAtrribPointer(0, 3, GL_FLOAT, GL_FALSE, 5, (void *)0);
     plane.setVertexAtrribPointer(1, 2, GL_FLOAT, GL_FALSE, 5, (void *)(3 * sizeof(float)));
 
+    DataObj<float> quad = DataObj<float>();
+    quad.bindVAO();
+    quad.loadVertexs(quadVertices, sizeof(quadVertices), 5);
+    quad.setVertexAtrribPointer(0, 2, GL_FLOAT, GL_FALSE, 4, (void *)0);
+    quad.setVertexAtrribPointer(1, 2, GL_FLOAT, GL_FALSE, 4, (void *)(2 * sizeof(float)));
+
     // set texture
-    ///*
     Texture2D texturePlane = Texture2D();
     texturePlane.setParameteri(GL_TEXTURE_WRAP_S, GL_REPEAT);
     texturePlane.setParameteri(GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -124,35 +139,56 @@ int main()
     texturePlane.setParameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     texturePlane.load("../img/metal.png");
 
-    //*/
+    Texture2D textureQuad = Texture2D();
+    textureQuad.setTexture(GL_RGB, screenWidth, screenHeight, nullptr);
+    textureQuad.setParameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    textureQuad.setParameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     // set shader
     Shader objShader("../shader/vertex_mvp.vs", "../shader/object.fs");
     Shader oneColorShader("../shader/vertex_mvp.vs", "../shader/onlyColor.fs");
     Shader lightShader("../shader/vertex_mvp.vs", "../shader/onlyColor.fs");
     Shader planeShader("../shader/vertex_mvp_with_no_normal.vs", "../shader/onlyTexture.fs");
+    Shader quadShader("../shader/vertex_2d.vs", "../shader/onlyTexture.fs");
 
-    // enable tests
-    glEnable(GL_DEPTH_TEST);
-    //glEnable(GL_STENCIL_TEST);
-    //glEnable(GL_CULL_FACE);
+    // bind tex & rbo to frameBuffer
+    unsigned int fbo;
+    glGenFramebuffers(1, &fbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureQuad.ID, 0);  
+
+    unsigned int rbo;
+    glGenRenderbuffers(1, &rbo);
+    glBindRenderbuffer(GL_RENDERBUFFER, rbo); 
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, screenWidth, screenHeight);  
+    glBindRenderbuffer(GL_RENDERBUFFER, 0);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+
+    if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     // draw loop
     while (!glfwWindowShouldClose(window))
     {
+        //==================//
+        //=== first pass ===//
+        //==================//
+
+        // enable tests
+        glEnable(GL_DEPTH_TEST);
+        //glEnable(GL_STENCIL_TEST);
+        //glEnable(GL_CULL_FACE);
+
+        // bind fbo
+        glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+        
         // set clear color
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-
-        //glStencilMask(0xFF); // templete test
-        //glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
         // deal with input
         processInput(window);
-
-        // bind texture
-        //texture01.bind(GL_TEXTURE0);
 
         // ligth
         glm::vec3 lightPos(1.5f, 1.0f, 2.0f);
@@ -160,9 +196,6 @@ int main()
         glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
 
         // draw obj
-        //glStencilFunc(GL_ALWAYS, 1, 0xFF);
-        //glStencilMask(0xFF);
-
         glm::mat4 v(1.0f);
         v = camera.GetViewMatrix();
         glm::mat4 p(1.0f);
@@ -188,24 +221,6 @@ int main()
         objShader.setVec3("intensityAmbient", glm::vec3(0.1,0.1,0.1));
 
         ourModel.Draw(objShader);
-
-        // draw selectionModel
-        /*
-        glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-        glStencilMask(0x00);
-        glm::mat4 s_obj(1.0f);
-        s_obj = glm::translate(s_obj, glm::vec3(0.0, -0.5, 0.0));
-        s_obj = glm::scale(s_obj, glm::vec3(0.153));
-        
-        oneColorShader.use();// use shader program and set uniformValue
-        
-        oneColorShader.setMat4("v", v);
-        oneColorShader.setMat4("p", p);
-        oneColorShader.setMat4("m", s_obj);
-
-        ourModel.Draw(oneColorShader);
-        glStencilFunc(GL_ALWAYS, 0, 0xFF);
-        */
        
         // draw light cube0
         glm::mat4 m_light(1.0f);
@@ -232,6 +247,7 @@ int main()
         light.drawArray(GL_TRIANGLES, 0);        
         
         // draw plane
+        //glDisable(GL_DEPTH_TEST);
         texturePlane.bind(GL_TEXTURE0);
         planeShader.use();
         planeShader.setMat4("v", v);
@@ -240,6 +256,25 @@ int main()
         planeShader.setInt("texture1", 0);
 
         plane.drawArray(GL_TRIANGLES, 0); 
+
+        //===================//
+        //=== second pass ===//
+        //===================//
+        
+        // bind defualt fbo
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        // draw a flat
+        textureQuad.bind(GL_TEXTURE0);
+        quadShader.use();
+        quadShader.setMat4("v", glm::mat4(1.0f));
+        quadShader.setMat4("p", glm::mat4(1.0f));
+        quadShader.setMat4("m", glm::mat4(1.0f));
+        quadShader.setInt("texture1", 0);
+        quad.drawArray(GL_TRIANGLES, 0);
+
+        //=====================//
+        //=== output window ===//
+        //=====================//
 
         // fill frame from buffer
         glfwSwapBuffers(window);
