@@ -114,7 +114,7 @@ int main()
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     // bind data to obj
-    DataObj flatFace = DataObj<float>();
+    DataObj<float> flatFace = DataObj<float>();
     flatFace.bindVAO();
     flatFace.loadVertexs(vertices, sizeof(vertices), 8);
     flatFace.loadIndices(indices, sizeof(indices), 1);
@@ -122,7 +122,7 @@ int main()
     flatFace.setVertexAtrribPointer(1, 3, GL_FLOAT, GL_FALSE, 8, (void *)(3 * sizeof(float)));
     flatFace.setVertexAtrribPointer(2, 2, GL_FLOAT, GL_FALSE, 8, (void *)(6 * sizeof(float)));
 
-    DataObj cubeFace = DataObj<float>();
+    DataObj<float> cubeFace = DataObj<float>();
     cubeFace.bindVAO();
     cubeFace.loadVertexs(myCube, sizeof(myCube), 5);
     cubeFace.setVertexAtrribPointer(0, 3, GL_FLOAT, GL_FALSE, 5, (void *)0);
