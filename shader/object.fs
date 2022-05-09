@@ -37,11 +37,12 @@ vec3 CalcPointLight(PointLight L)
     float lightDistance = distance(L.lightPos, FragPos);
     vec3 lightDir = normalize(L.lightPos - FragPos);
     float cosIn = dot(normalize(Normal), lightDir);
-    vec3 diffuse = M.kd * vec3(texture(M.texture_diffuse1, st).xyz) * (L.lightColor) * max(cosIn, 0);
+    vec3 diffuse = M.kd * vec3(texture(M.texture_diffuse1, st).rgb) * (L.lightColor/ pow(lightDistance, 2)) * max(cosIn, 0);
 
     vec3 viewDir = normalize(eyePos - FragPos);
     vec3 halfVec = normalize(lightDir + viewDir);
-    vec3 specular = vec3(texture(M.texture_specular1, st).xyz) * (L.lightColor / pow(lightDistance, 2)) * pow(max(dot(halfVec, normalize(Normal)), 0), M.shininess);
+    vec3 specular = M.ks * texture(M.texture_specular1, st).r * (L.lightColor / pow(lightDistance, 2)) * pow(max(dot(halfVec, normalize(Normal)), 0), M.shininess);
+    //vec3 specular = M.ks * vec3(texture(M.texture_specular1, st).xyz) * (L.lightColor / pow(lightDistance, 2)) * pow(max(dot(halfVec, normalize(Normal)), 0), M.shininess);
     //vec3 specular = M.ks * (L.lightColor / pow(lightDistance, 2)) * pow(max(dot(halfVec, normalize(Normal)), 0), M.shininess);
 
     return (ambient + diffuse + specular);

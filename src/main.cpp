@@ -73,51 +73,6 @@ float quadVertices[] = { // vertex attributes for a quad that fills the entire s
     1.0f, -1.0f, 1.0f, 0.0f,
     1.0f, 1.0f, 1.0f, 1.0f};
 
-float skyboxVertices[] = {
-    // positions          
-    -1.0f,  1.0f, -1.0f,
-    -1.0f, -1.0f, -1.0f,
-     1.0f, -1.0f, -1.0f,
-     1.0f, -1.0f, -1.0f,
-     1.0f,  1.0f, -1.0f,
-    -1.0f,  1.0f, -1.0f,
-
-    -1.0f, -1.0f,  1.0f,
-    -1.0f, -1.0f, -1.0f,
-    -1.0f,  1.0f, -1.0f,
-    -1.0f,  1.0f, -1.0f,
-    -1.0f,  1.0f,  1.0f,
-    -1.0f, -1.0f,  1.0f,
-
-     1.0f, -1.0f, -1.0f,
-     1.0f, -1.0f,  1.0f,
-     1.0f,  1.0f,  1.0f,
-     1.0f,  1.0f,  1.0f,
-     1.0f,  1.0f, -1.0f,
-     1.0f, -1.0f, -1.0f,
-
-    -1.0f, -1.0f,  1.0f,
-    -1.0f,  1.0f,  1.0f,
-     1.0f,  1.0f,  1.0f,
-     1.0f,  1.0f,  1.0f,
-     1.0f, -1.0f,  1.0f,
-    -1.0f, -1.0f,  1.0f,
-
-    -1.0f,  1.0f, -1.0f,
-     1.0f,  1.0f, -1.0f,
-     1.0f,  1.0f,  1.0f,
-     1.0f,  1.0f,  1.0f,
-    -1.0f,  1.0f,  1.0f,
-    -1.0f,  1.0f, -1.0f,
-
-    -1.0f, -1.0f, -1.0f,
-    -1.0f, -1.0f,  1.0f,
-     1.0f, -1.0f, -1.0f,
-     1.0f, -1.0f, -1.0f,
-    -1.0f, -1.0f,  1.0f,
-     1.0f, -1.0f,  1.0f
-};
-
 // ==== MAIN ====
 int main()
 {
@@ -166,11 +121,12 @@ int main()
     plane.loadVertexs(planeVertices, sizeof(planeVertices), 5);
     plane.setVertexAtrribPointer(0, 3, GL_FLOAT, GL_FALSE, 5, (void *)0);
     plane.setVertexAtrribPointer(1, 2, GL_FLOAT, GL_FALSE, 5, (void *)(3 * sizeof(float)));
-    
-    DataObj<float> skybox = DataObj<float>();
-    skybox.bindVAO();
-    skybox.loadVertexs(skyboxVertices, sizeof(skyboxVertices),3);
-    skybox.setVertexAtrribPointer(0, 3, GL_FLOAT, GL_FALSE, 3, (void*)0);
+
+    DataObj<float> quad = DataObj<float>();
+    quad.bindVAO();
+    quad.loadVertexs(quadVertices, sizeof(quadVertices), 4);
+    quad.setVertexAtrribPointer(0, 2, GL_FLOAT, GL_FALSE, 4, (void *)0);
+    quad.setVertexAtrribPointer(1, 2, GL_FLOAT, GL_FALSE, 4, (void *)(2 * sizeof(float)));
 
     // set texture
     Texture2D texturePlane = Texture2D();
@@ -180,39 +136,34 @@ int main()
     texturePlane.setParameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     texturePlane.load("../img/metal.png");
     
-    // sky box 
-    unsigned int textureSkyBox;
-    glGenTextures(1, &textureSkyBox);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, textureSkyBox);
-    std::vector<std::string> textures_faces{
-        "../img/skybox/right.jpg",
-        "../img/skybox/left.jpg",
-        "../img/skybox/top.jpg",
-        "../img/skybox/bottom.jpg",
-        "../img/skybox/front.jpg",
-        "../img/skybox/back.jpg"};
+    Texture2D textureQuad = Texture2D();
+    textureQuad.setTexture(GL_RGB, screenWidth, screenHeight, nullptr);
+    textureQuad.setParameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    textureQuad.setParameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    
+    // bind tex & rbo to frameBuffer
+    unsigned int fbo;
+    glGenFramebuffers(1, &fbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureQuad.ID, 0);  
 
-    int width, height, nrChannels;
-    unsigned char *data;
-    for (unsigned int i = 0; i < textures_faces.size(); i++)
-    {
-        data = stbi_load(textures_faces[i].c_str(), &width, &height, &nrChannels, 0);
-        glTexImage2D(
-            GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
-            0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-    }
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    unsigned int rbo;
+    glGenRenderbuffers(1, &rbo);
+    glBindRenderbuffer(GL_RENDERBUFFER, rbo); 
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, screenWidth, screenHeight);  
+    glBindRenderbuffer(GL_RENDERBUFFER, 0);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+
+    if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     // set shader
     Shader objShader("../shader/vertex_mvp.vs", "../shader/object.fs");
     Shader lightShader("../shader/vertex_mvp.vs", "../shader/onlyColor.fs");
     Shader planeShader("../shader/vertex_mvp_with_no_normal.vs", "../shader/onlyTexture.fs");
-    Shader skyboxShader("../shader/skybox.vs","../shader/skybox.fs");
-
+    Shader quadShader("../shader/vertex_2d.vs", "../shader/onlyTexture.fs");
+    
     // draw loop
     while (!glfwWindowShouldClose(window))
     {
@@ -222,8 +173,6 @@ int main()
 
         // enable tests
         glEnable(GL_DEPTH_TEST);
-        // glEnable(GL_STENCIL_TEST);
-        // glEnable(GL_CULL_FACE);
 
         // set clear color
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
@@ -233,9 +182,12 @@ int main()
         processInput(window);
 
         // set ligth
-        glm::vec3 lightPos(1.5f, 1.0f, 2.0f);
-        glm::vec3 lightPos1(-1.9f, 2.0f, 0.0f);
-        glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
+        std::vector<glm::vec3> lightPos;
+        lightPos.push_back(glm::vec3(1.5f, 1.0f, 2.0f));
+        lightPos.push_back(glm::vec3(-1.9f, 2.0f, 0.0f));
+        std::vector<glm::vec3> lightColor;
+        lightColor.push_back(glm::vec3(5.0f, 5.0f, 5.0f));
+        lightColor.push_back(glm::vec3(3.0f, 3.0f, 3.0f));
 
         // get v-mat & p-mat
         glm::mat4 v(1.0f);
@@ -255,15 +207,30 @@ int main()
         objShader.setMat4("m", m_obj);
         objShader.setMat4("NormalMat", glm::transpose(glm::inverse(m_obj)));
 
-        objShader.setVec3("Light[0].lightColor", lightColor);
-        objShader.setVec3("Light[0].lightPos", lightPos);
-        objShader.setVec3("Light[1].lightColor", lightColor);
-        objShader.setVec3("Light[1].lightPos", lightPos1);
+        objShader.setVec3("Light[0].lightColor", lightColor[0]);
+        objShader.setVec3("Light[0].lightPos", lightPos[0]);
+        objShader.setVec3("Light[1].lightColor", lightColor[1]);
+        objShader.setVec3("Light[1].lightPos", lightPos[1]);
 
         objShader.setVec3("eyePos", camera.Position);
         objShader.setVec3("intensityAmbient", glm::vec3(0.1, 0.1, 0.1));
 
         ourModel.Draw(objShader);
+
+        // draw light cubes
+        int lightCnt = lightPos.size();
+        for(int i=0; i<lightCnt; i++)
+        {
+            glm::mat4 m_light(1.0f);
+            m_light = glm::translate(m_light, lightPos[i]);
+            m_light = glm::scale(m_light, glm::vec3(0.1f));
+            lightShader.use();
+            lightShader.setMat4("v", v);
+            lightShader.setMat4("p", p);
+            lightShader.setMat4("m", m_light);
+
+            light.drawArray(GL_TRIANGLES, 0);  
+        }
 
         //===draw plane===
         texturePlane.bind(GL_TEXTURE0);
@@ -272,19 +239,8 @@ int main()
         planeShader.setMat4("p", p);
         planeShader.setMat4("m", glm::mat4(1.0f));
         planeShader.setInt("texture1", 0);
-
+        
         plane.drawArray(GL_TRIANGLES, 0);
-
-        //===draw skybox===
-        glDepthFunc(GL_LEQUAL);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, textureSkyBox);
-        glm::mat4 view_not_move = glm::mat4(glm::mat3(v));
-        skyboxShader.use();
-        skyboxShader.setMat4("v", view_not_move);
-        skyboxShader.setMat4("p", p);
-        skyboxShader.setInt("skybox", 0);
-        skybox.drawArray(GL_TRIANGLES, 0);
-        glDepthFunc(GL_LESS);
 
         //=====================//
         //=== output window ===//

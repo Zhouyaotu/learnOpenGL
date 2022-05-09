@@ -118,12 +118,11 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene)
     }
 
     // 处理材质
+    glm::vec3 ka, kd, ks;
     if(mesh->mMaterialIndex >= 0)
     {
         aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
         std::cout<< "model - vert:index " <<mesh->mNumVertices << ":" << mesh->mNumFaces << std::endl;
-        
-        glm::vec3 ka, kd, ks;
 
         std::vector<Texture2D> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse", ka, kd, ks);
         textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
@@ -132,7 +131,7 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene)
         textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
     }
 
-    return Mesh(vertices, indices, textures);
+    return Mesh(vertices, indices, textures, ka, kd, ks);
 }
 
 std::vector<Texture2D> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName, glm::vec3 &ka, glm::vec3 &kd, glm::vec3 &ks)
@@ -150,7 +149,7 @@ std::vector<Texture2D> Model::loadMaterialTextures(aiMaterial *mat, aiTextureTyp
         kd = glm::vec3(color.r, color.g, color.b);
         mat->Get(AI_MATKEY_COLOR_SPECULAR, color);
         ks = glm::vec3(color.r, color.g, color.b);
-        //std::cout << color.r << std::endl;
+        //std::cout << ks.r << ks.g << ks.b << std::endl;
 
         mat->GetTexture(type, i, &str);
         //mat->Get(AI_MATKEY_TEXTURE(type, i), str);
